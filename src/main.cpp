@@ -1,6 +1,6 @@
 #include <iostream>
-#include "retouch/ImageLoader.h"
-#include "retouch/ImageSaver.h"
+#include "retouch/Image/ImageLoader.h"
+#include "retouch/Image/ImageSaver.h"
 int main()
 {
     retouch::ImageLoader loader;
