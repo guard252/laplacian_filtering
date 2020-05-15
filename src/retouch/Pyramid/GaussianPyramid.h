@@ -20,11 +20,11 @@ namespace retouch
         // Builds all layers of the pyramid, thereby fills m_layers.
         void build();
 
-        const Image& operator[](size_t index)const { return m_layers.at(index); }
+        [[nodiscard]] const Image& operator[](size_t index)const { return m_layers.at(index); }
 
-        static Image reduce(const Image& original_image);
+        [[nodiscard]] static Image reduce(const Image& original_image);
 
-        static Image expand(const Image& image);
+        [[nodiscard]] static Image expand(const Image& image);
     };
 }
 

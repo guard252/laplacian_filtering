@@ -13,12 +13,12 @@ int main()
         retouch::GaussianPyramid pyramid(layer_1);
         pyramid.build();
         const auto& layers = pyramid.getLayers();
-        int curent_layer = 0;
+        int current_layer = 0;
         for(auto layer : layers)
         {
-            std::string file_path = "../images/output_images/layer_" + std::to_string(curent_layer) + ".png";
+            std::string file_path = "../images/output_images/layer_" + std::to_string(current_layer) + ".png";
             saver.savePNG(layer, file_path);
-            curent_layer++;
+            current_layer++;
         }
     }
     catch(std::runtime_error& e)

@@ -13,7 +13,7 @@ add_executable(laplacian_pyramid
         src/retouch/Image/Image.cpp
         src/retouch/Image/Pixel.h
         src/retouch/Pyramid/GaussianPyramid.h
-        src/retouch/Pyramid/GaussianPyramid.cpp)
+        src/retouch/Pyramid/GaussianPyramid.cpp src/retouch/Pyramid/LaplacianPyramid.cpp src/retouch/Pyramid/LaplacianPyramid.h)
 
 include_directories(vendor/)
 

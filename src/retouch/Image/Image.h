@@ -35,9 +35,9 @@ namespace retouch
         [[nodiscard]] size_t getBitDepth() const { return m_bit_depth; }
         [[nodiscard]] size_t getChannelsCount() const { return m_channels_count; }
 
-        std::unique_ptr<unsigned char> getPixelDataCopy() const;
+        [[nodiscard]] std::unique_ptr<unsigned char> getPixelDataCopy() const;
 
-        Pixel getPixel(size_t x, size_t y) const
+        [[nodiscard]] Pixel getPixel(size_t x, size_t y) const
         {
                 if(x >= m_width || y >= m_height) throw std::out_of_range("Index out of bounds of image data.");
                 unsigned char* pixel_start = m_pixel_data.get() + (y * m_width + x) * m_channels_count;

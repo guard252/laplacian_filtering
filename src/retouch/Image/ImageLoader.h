@@ -9,7 +9,7 @@ namespace retouch
     class ImageLoader
     {
     public:
-        Image loadPNG(std::string_view input_path)const;
+        [[nodiscard]] Image loadPNG(std::string_view input_path)const;
     };
 }
 
