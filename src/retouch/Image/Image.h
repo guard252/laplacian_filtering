@@ -29,11 +29,11 @@ namespace retouch
               size_t bit_depth = KDefault_bit_depth,
               size_t channels_count = KDefault_channels_count);
 
-        const auto& getPixelData() const { return m_pixel_data; }
-        size_t getWidth() const { return m_width; }
-        size_t getHeight() const { return m_height; }
-        size_t getBitDepth() const { return m_bit_depth; }
-        size_t getChannelsCount() const { return m_channels_count; }
+        [[nodiscard]] const auto& getPixelData() const { return m_pixel_data; }
+        [[nodiscard]] size_t getWidth() const { return m_width; }
+        [[nodiscard]] size_t getHeight() const { return m_height; }
+        [[nodiscard]] size_t getBitDepth() const { return m_bit_depth; }
+        [[nodiscard]] size_t getChannelsCount() const { return m_channels_count; }
 
         std::unique_ptr<unsigned char> getPixelDataCopy() const;
 
