@@ -9,9 +9,17 @@ int main()
     retouch::ImageSaver saver;
     try
     {
-        retouch::Image data = loader.loadPNG("../images/input_images/room.png");
-        retouch::Image reduced_image = retouch::GaussianPyramid::reduce(data);
-        saver.savePNG(reduced_image, "../images/output_images/room_reduced.png");
+        retouch::Image layer_1 = loader.loadPNG("../images/input_images/room.png");
+        retouch::GaussianPyramid pyramid(layer_1);
+        pyramid.build();
+        const auto& layers = pyramid.getLayers();
+        int curent_layer = 0;
+        for(auto layer : layers)
+        {
+            std::string file_path = "../images/output_images/layer_" + std::to_string(curent_layer) + ".png";
+            saver.savePNG(layer, file_path);
+            curent_layer++;
+        }
     }
     catch(std::runtime_error& e)
     {

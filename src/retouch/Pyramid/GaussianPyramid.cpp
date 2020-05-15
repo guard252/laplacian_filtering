@@ -15,12 +15,16 @@ namespace retouch
     }
 
     GaussianPyramid::GaussianPyramid(Image&& first_layer):
-    m_layers{std::move(first_layer)}{};
+    m_layers{first_layer}{};
 
 
     void GaussianPyramid::build()
     {
-        
+        while(m_layers.back().getHeight() / 2 > KMin_image_resolution &&
+        m_layers.back().getWidth() / 2> KMin_image_resolution)
+        {
+            m_layers.push_back(reduce(m_layers.back()));
+        }
     }
 
     Image retouch::GaussianPyramid::reduce(const retouch::Image &original_image)
@@ -53,6 +57,37 @@ namespace retouch
             }
         }
         return reduced_image;
+    }
+
+    Image retouch::GaussianPyramid::expand(const retouch::Image &original_image)
+    {
+        Image expanded_image(original_image.getWidth() * 2,
+                            original_image.getHeight() * 2,
+                            original_image.getBitDepth(),
+                            original_image.getChannelsCount());
+
+        constexpr int KRadius = 2;
+        for(int x = 0; x < expanded_image.getWidth(); x++)
+        {
+            for (int y = 0; y < expanded_image.getHeight(); y++)
+            {
+                std::vector<Pixel> neighbors;
+                for(int i = -KRadius; i <= KRadius; i++)
+                {
+                    for(int j = -KRadius; j <= KRadius; j++)
+                    {
+                        if((x - i) % 2 == 0 && (y - j) % 2 == 0 &&
+                                (x - i) / 2 > 0 && (x - i) / 2 < original_image.getWidth() &&
+                                (y - j) / 2 > 0 && (y - j) / 2 < original_image.getHeight())
+                        neighbors.push_back(original_image.getPixel((x - i) / 2, (y - j) / 2));
+                    }
+                }
+                Pixel new_pixel;
+                std::for_each(neighbors.begin(), neighbors.end(), [&](Pixel& a){a = a / neighbors.size(); new_pixel = new_pixel + a;});
+                expanded_image.setPixel(x, y, new_pixel);
+            }
+        }
+        return expanded_image;
     }
 
 }
