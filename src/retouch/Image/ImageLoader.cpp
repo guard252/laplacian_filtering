@@ -8,10 +8,10 @@
 namespace retouch
 {
 
-    ImageData ImageLoader::loadPNG(std::string_view path) const
+    Image ImageLoader::loadPNG(std::string_view path) const
     {
-        const size_t bit_depth = 8;
-        const size_t channels_count = 4;
+        const size_t KBit_depth =  8;
+        const size_t KChannels_count = 4;
 
 
         png_image image = {};
@@ -37,7 +37,7 @@ namespace retouch
             throw std::runtime_error("Unable to finish reading the image.");
         }
 
-        ImageData image_data{buffer, image.width, image.height, bit_depth, channels_count};
+        Image image_data{std::unique_ptr<unsigned char>(buffer), image.width, image.height, KBit_depth, KChannels_count};
         png_image_free(&image);
         return image_data;
     }

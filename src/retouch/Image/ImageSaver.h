@@ -3,13 +3,13 @@
 
 #include <string_view>
 
-#include "ImageData.h"
+#include "Image.h"
 namespace retouch
 {
     class ImageSaver
     {
     public:
-        void savePNG(const ImageData& image_data, std::string_view output_path)const;
+        void savePNG(const Image& image_data, std::string_view output_path)const;
     };
 }
 

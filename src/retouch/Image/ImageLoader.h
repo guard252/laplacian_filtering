@@ -3,13 +3,13 @@
 
 #include <string>
 #include <string_view>
-#include "ImageData.h"
+#include "Image.h"
 namespace retouch
 {
     class ImageLoader
     {
     public:
-        ImageData loadPNG(std::string_view input_path)const;
+        Image loadPNG(std::string_view input_path)const;
     };
 }
 
