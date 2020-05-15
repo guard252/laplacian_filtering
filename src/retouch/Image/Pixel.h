@@ -1,32 +1,21 @@
-#ifndef LAPLACIAN_PYRAMID_PIXEL_H
-#define LAPLACIAN_PYRAMID_PIXEL_H
+#include <glm/glm.hpp>
 
-struct Pixel
+namespace retouch
 {
-    unsigned char m_red{0};
-    unsigned char m_green{0};
-    unsigned char m_blue{0};
-    unsigned char m_alpha{1};
-    Pixel operator-(const Pixel& other)
+    using Pixel = glm::u8vec4;
+
+    inline Pixel operator *(Pixel pixel, double multiplier)
     {
-        return Pixel{static_cast<unsigned char>(m_red - other.m_red),
-                     static_cast<unsigned char>(m_green - other.m_green),
-                     static_cast<unsigned char>(m_blue - other.m_blue),
-                     static_cast<unsigned char>(m_alpha - other.m_alpha)};
+        return{static_cast<unsigned char>(pixel.r * multiplier),
+               static_cast<unsigned char>(pixel.g * multiplier),
+               static_cast<unsigned char>(pixel.b * multiplier),
+               static_cast<unsigned char>(pixel.a * multiplier)};
     }
-    Pixel operator+(const Pixel& other)
+    inline Pixel operator /(Pixel pixel, double divider)
     {
-        return Pixel{static_cast<unsigned char>(m_red + other.m_red),
-                     static_cast<unsigned char>(m_green + other.m_green),
-                     static_cast<unsigned char>(m_blue + other.m_blue),
-                     static_cast<unsigned char>(std::max(m_alpha, other.m_alpha))};
+        return{static_cast<unsigned char>(pixel.r / divider),
+               static_cast<unsigned char>(pixel.g / divider),
+               static_cast<unsigned char>(pixel.b / divider),
+               static_cast<unsigned char>(pixel.a / divider)};
     }
-    Pixel operator/(const double& divider)
-    {
-        return Pixel{static_cast<unsigned char>(m_red / divider),
-                     static_cast<unsigned char>(m_green / divider),
-                     static_cast<unsigned char>(m_blue / divider),
-                     static_cast<unsigned char>(m_alpha)};
-    }
-};
-#endif
+}

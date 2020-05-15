@@ -7,6 +7,7 @@
 #include "Pixel.h"
 namespace retouch
 {
+
     class Image
     {
         static constexpr size_t KDefault_bit_depth = 8;
@@ -41,21 +42,22 @@ namespace retouch
         {
                 if(x >= m_width || y >= m_height) throw std::out_of_range("Index out of bounds of image data.");
                 unsigned char* pixel_start = m_pixel_data.get() + (y * m_width + x) * m_channels_count;
-                return Pixel{*(pixel_start),
-                             *(pixel_start + 1),
-                             *(pixel_start + 2),
-                             *(pixel_start + 3)};
+                return {*(pixel_start),
+                        *(pixel_start + 1),
+                        *(pixel_start + 2),
+                        *(pixel_start + 3)};
         }
         void setPixel(size_t x, size_t y, Pixel new_pixel)
         {
             if(x >= m_width || y >= m_height) throw std::out_of_range("Index out of bounds of image data.");
             unsigned char* pixel_start = m_pixel_data.get() + (y * m_width + x) * m_channels_count;
-            *(pixel_start) = new_pixel.m_red;
-            *(pixel_start + 1) = new_pixel.m_green;
-            *(pixel_start + 2) = new_pixel.m_blue;
-            *(pixel_start + 3) = new_pixel.m_alpha;
+            *(pixel_start) = new_pixel.r;
+            *(pixel_start + 1) = new_pixel.g;
+            *(pixel_start + 2) = new_pixel.b;
+            *(pixel_start + 3) = new_pixel.b;
         }
 
     };
+
 }
 #endif
