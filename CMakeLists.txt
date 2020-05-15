@@ -3,7 +3,17 @@ project(laplacian_pyramid)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(laplacian_pyramid src/main.cpp src/retouch/Image/ImageLoader.h src/retouch/Image/ImageLoader.cpp src/retouch/Image/ImageSaver.cpp src/retouch/Image/ImageSaver.h src/retouch/Image/ImageData.h)
+add_executable(laplacian_pyramid
+        src/main.cpp
+        src/retouch/Image/ImageLoader.h
+        src/retouch/Image/ImageLoader.cpp
+        src/retouch/Image/ImageSaver.cpp
+        src/retouch/Image/ImageSaver.h
+        src/retouch/Image/Image.h
+        src/retouch/Image/Image.cpp
+        src/retouch/Image/Pixel.h
+        src/retouch/Pyramid/GaussianPyramid.h
+        src/retouch/Pyramid/GaussianPyramid.cpp)
 
 include_directories(vendor/)
 
