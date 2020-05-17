@@ -4,18 +4,10 @@
 
 namespace retouch
 {
-    GaussianPyramid::GaussianPyramid(const Image &image)
-    {
-        m_layers.push_back(Image(image.getPixelDataCopy(),
-                        image.getWidth(),
-                        image.getHeight(),
-                        image.getBitDepth(),
-                        image.getChannelsCount()));
-
-    }
+    GaussianPyramid::GaussianPyramid(const Image &image) : m_layers{image}{}
 
     GaussianPyramid::GaussianPyramid(Image&& first_layer):
-    m_layers{first_layer}{};
+    m_layers{first_layer}{}
 
 
     void GaussianPyramid::build()
@@ -51,8 +43,9 @@ namespace retouch
                         }
                     }
                 }
-                Pixel new_pixel;
-                std::for_each(neighbors.begin(), neighbors.end(), [&](Pixel& a){a = a / neighbors.size(); new_pixel = new_pixel + a;});
+                Pixel new_pixel{0,0,0,0};
+                std::for_each(neighbors.begin(), neighbors.end(), [&](Pixel& a){a = pixelDivision(a, neighbors.size());
+                new_pixel = pixelSum(new_pixel, a);});
                 reduced_image.setPixel(x, y, new_pixel);
             }
         }
@@ -82,8 +75,11 @@ namespace retouch
                         neighbors.push_back(original_image.getPixel((x - i) / 2, (y - j) / 2));
                     }
                 }
-                Pixel new_pixel;
-                std::for_each(neighbors.begin(), neighbors.end(), [&](Pixel& a){a = a / neighbors.size(); new_pixel = new_pixel + a;});
+                Pixel new_pixel{0,0,0,UCHAR_MAX};
+                std::for_each(neighbors.begin(), neighbors.end(), [&](Pixel& a){
+                    a = pixelDivision(a, neighbors.size());
+                    new_pixel = pixelSum(new_pixel, a);
+                });
                 expanded_image.setPixel(x, y, new_pixel);
             }
         }

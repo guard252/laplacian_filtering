@@ -2,10 +2,11 @@
 #define LAPLACIAN_PYRAMID_GAUSSIANPYRAMID_H
 #include <vector>
 #include "../Image/Image.h"
+#include "IPyramid.h"
 
 namespace retouch
 {
-    class GaussianPyramid
+    class GaussianPyramid : public IPyramid
     {
         static constexpr size_t KMin_image_resolution{ 4 };
 
@@ -13,14 +14,14 @@ namespace retouch
 
     public:
         GaussianPyramid(const Image& first_layer);
+
         GaussianPyramid(Image&& first_layer);
 
-        [[nodiscard]] const auto& getLayers() const { return m_layers; }
+        void build() override;
 
-        // Builds all layers of the pyramid, thereby fills m_layers.
-        void build();
+        [[nodiscard]] const std::vector<Image>& getLayers() const override { return m_layers; }
 
-        [[nodiscard]] const Image& operator[](size_t index)const { return m_layers.at(index); }
+        [[nodiscard]] const Image& operator[](size_t index) const override { return m_layers.at(index); }
 
         [[nodiscard]] static Image reduce(const Image& original_image);
 
