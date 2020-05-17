@@ -14,8 +14,8 @@ namespace retouch
         static constexpr size_t KDefault_channels_count = 4;
 
         std::unique_ptr<unsigned char> m_pixel_data;
-        size_t m_width;
-        size_t m_height;
+        mutable size_t m_width;
+        mutable size_t m_height;
         size_t m_bit_depth;
         size_t m_channels_count;
     public:
@@ -24,19 +24,24 @@ namespace retouch
         Image(std::unique_ptr<unsigned char>&& pixel_data, size_t width, size_t height,
                 size_t bit_depth = KDefault_bit_depth,
                 size_t channels_count = KDefault_channels_count);
-
         //This ctor generates an image with every buffer bit set to 0
         Image(size_t width, size_t height,
               size_t bit_depth = KDefault_bit_depth,
               size_t channels_count = KDefault_channels_count);
 
         [[nodiscard]] const auto& getPixelData() const { return m_pixel_data; }
+
         [[nodiscard]] size_t getWidth() const { return m_width; }
+
         [[nodiscard]] size_t getHeight() const { return m_height; }
+
         [[nodiscard]] size_t getBitDepth() const { return m_bit_depth; }
+
         [[nodiscard]] size_t getChannelsCount() const { return m_channels_count; }
 
         [[nodiscard]] std::unique_ptr<unsigned char> getPixelDataCopy() const;
+
+        [[nodiscard]] Image operator-(const Image& other)const;
 
         [[nodiscard]] Pixel getPixel(size_t x, size_t y) const
         {
@@ -54,7 +59,7 @@ namespace retouch
             *(pixel_start) = new_pixel.r;
             *(pixel_start + 1) = new_pixel.g;
             *(pixel_start + 2) = new_pixel.b;
-            *(pixel_start + 3) = new_pixel.b;
+            *(pixel_start + 3) = new_pixel.a;
         }
 
     };
