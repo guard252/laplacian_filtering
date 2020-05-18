@@ -15,9 +15,10 @@ namespace retouch
 
         void build() override;
 
-        [[nodiscard]] const std::vector<Image>&  getLayers() const override { return m_layers; }
+        const std::vector<Image>&  getLayers() const override { return m_layers; }
 
-        [[nodiscard]] const Image& operator[](size_t index) const override { return m_layers.at(index); }
+        const Image& operator[](size_t index) const override { return m_layers.at(index); }
+
     };
 }
 

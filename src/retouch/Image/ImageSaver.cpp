@@ -1,4 +1,6 @@
 #include <stdexcept>
+#include <algorithm>
+
 #include "png.h"
 
 #include "ImageSaver.h"
@@ -11,6 +13,7 @@ namespace retouch
         png_structp png_ptr;
         png_infop info_ptr;
         png_byte ** row_pointers = nullptr;
+        constexpr size_t bit_depth = 8;
 
         fp = std::fopen(path.data(), "wb");
         if(fp == nullptr)
@@ -45,19 +48,26 @@ namespace retouch
                 info_ptr,
                 image_data.getWidth(),
                 image_data.getHeight(),
-                image_data.getBitDepth(),
+                bit_depth,
                 PNG_COLOR_TYPE_RGBA,
                 PNG_INTERLACE_NONE,
                 PNG_COMPRESSION_TYPE_DEFAULT,
                 PNG_FILTER_TYPE_DEFAULT);
+
+        const size_t buffer_size = image_data.getWidth() * image_data.getHeight() * image_data.getChannelsCount();
+        std::unique_ptr<unsigned char[]> buffer = std::make_unique<unsigned char[]>(buffer_size);
+        for(size_t i = 0; i  < buffer_size; i++)
+        {
+            buffer[i] = std::clamp(int(image_data.getPixelData()[i]), 0, UCHAR_MAX);
+        }
 
         row_pointers = (png_byte**)png_malloc (png_ptr, image_data.getHeight() * sizeof (png_byte*));
         for (int y = 0; y < image_data.getHeight(); y++) {
             png_byte* row = (png_byte *)png_malloc(png_ptr, sizeof (uint8_t) * image_data.getWidth() * image_data.getChannelsCount());
             row_pointers[y] = row;
             for (int x = 0; x < image_data.getWidth(); x++) {
-                unsigned char* position = image_data.getPixelData().get() + (image_data.getWidth() * y + x) * image_data.getChannelsCount();
-                row[x * image_data.getChannelsCount()] =     *position;
+                unsigned char* position = buffer.get() + (image_data.getWidth() * y + x) * image_data.getChannelsCount();
+                row[x * image_data.getChannelsCount()] =     *(position);
                 row[x * image_data.getChannelsCount() + 1] = *(position + 1);
                 row[x * image_data.getChannelsCount() + 2] = *(position + 2);
                 row[x * image_data.getChannelsCount() + 3] = *(position + 3);

@@ -10,7 +10,6 @@ namespace retouch
 
     Image ImageLoader::loadPNG(std::string_view path) const
     {
-        const size_t KBit_depth =  8;
         const size_t KChannels_count = 4;
 
 
@@ -22,22 +21,22 @@ namespace retouch
         }
         png_bytep buffer;
         image.format = PNG_FORMAT_RGBA;
-
-        try
-        {
-            buffer = new unsigned char[PNG_IMAGE_SIZE(image)/sizeof(unsigned char)];
-        }
-        catch(std::bad_alloc&)
-        {
-            throw std::runtime_error("Not enough memory for image data allocation.");
-        }
+        const size_t buffer_size = PNG_IMAGE_SIZE(image)/sizeof(unsigned char);
+        buffer = new unsigned char[buffer_size];
 
         if( png_image_finish_read(&image, nullptr, buffer, 0, nullptr) == 0)
         {
             throw std::runtime_error("Unable to finish reading the image.");
         }
 
-        Image image_data{std::unique_ptr<unsigned char>(buffer), image.width, image.height, KBit_depth, KChannels_count};
+        short* buffer_short = new short[buffer_size];
+        for(int i = 0; i < buffer_size; i++)
+        {
+            buffer_short[i] = buffer[i];
+        }
+        delete[] buffer;
+
+        Image image_data{std::unique_ptr<short[]>(buffer_short), image.width, image.height, KChannels_count};
         png_image_free(&image);
         return image_data;
     }

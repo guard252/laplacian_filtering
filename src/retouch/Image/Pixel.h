@@ -1,35 +1,37 @@
+#include <algorithm>
+
 #include <glm/glm.hpp>
 
 namespace retouch
 {
-    using Pixel = glm::u8vec4;
+    using Pixel = glm::i16vec4;
 
     inline Pixel pixelMultiplication(Pixel pixel, double multiplier)
     {
-        return{static_cast<unsigned char>(pixel.r * multiplier),
-               static_cast<unsigned char>(pixel.g * multiplier),
-               static_cast<unsigned char>(pixel.b * multiplier),
+        return{std::clamp(int(pixel.r * multiplier), 0, UCHAR_MAX),
+               std::clamp(int(pixel.g * multiplier), 0, UCHAR_MAX),
+               std::clamp(int(pixel.b * multiplier), 0, UCHAR_MAX),
                static_cast<unsigned char>(UCHAR_MAX)};
     }
     inline Pixel pixelDivision(Pixel pixel, double divider)
     {
-        return{static_cast<unsigned char>(pixel.r / divider),
-               static_cast<unsigned char>(pixel.g / divider),
-               static_cast<unsigned char>(pixel.b / divider),
-               static_cast<unsigned char>(UCHAR_MAX)};
+        return{std::clamp(int(pixel.r / divider), 0, UCHAR_MAX),
+               std::clamp(int(pixel.g / divider), 0, UCHAR_MAX),
+               std::clamp(int(pixel.b / divider), 0, UCHAR_MAX),
+               UCHAR_MAX};
     }
-    inline Pixel pixelDifference(Pixel first, Pixel second)
+    inline Pixel pixelSubtraction(Pixel first, Pixel second)
     {
-        return {static_cast<unsigned char>(std::abs((int)first.r - second.r)),
-                static_cast<unsigned char>(std::abs((int)first.g - second.g)),
-                static_cast<unsigned char>(std::abs((int)first.b - second.b)),
-                static_cast<unsigned char>(UCHAR_MAX)};
+        return {(int(first.r) - second.r),
+                (int(first.g) - second.g),
+                (int(first.b) - second.b),
+                UCHAR_MAX};
     }
     inline Pixel pixelSum(Pixel first, Pixel second)
     {
-        return {static_cast<unsigned char>(first.r + second.r),
-                static_cast<unsigned char>(first.g + second.g),
-                static_cast<unsigned char>(first.b + second.b),
-                static_cast<unsigned char>(UCHAR_MAX)};
+        return {std::clamp(first.r + second.r, 0, UCHAR_MAX),
+                std::clamp(first.g + second.g, 0, UCHAR_MAX),
+                std::clamp(first.b + second.b, 0, UCHAR_MAX),
+                UCHAR_MAX};
     }
 }

@@ -12,34 +12,33 @@ namespace retouch
 
     void GaussianPyramid::build()
     {
-        while(m_layers.back().getHeight() / 2 > KMin_image_resolution &&
-        m_layers.back().getWidth() / 2> KMin_image_resolution)
+        while((m_layers.back().getHeight() + 1) / 2 > KMin_image_resolution &&
+                (m_layers.back().getWidth() + 1) / 2 > KMin_image_resolution)
         {
-            m_layers.push_back(reduce(m_layers.back()));
+            m_layers.push_back(reduce(m_layers.size() - 1));
         }
     }
 
-    Image retouch::GaussianPyramid::reduce(const retouch::Image &original_image)
+    Image GaussianPyramid::reduce(size_t layer)
     {
-        Image reduced_image(original_image.getWidth() / 2,
-                            original_image.getHeight() / 2,
-                            original_image.getBitDepth(),
-                            original_image.getChannelsCount());
+        Image reduced_image((m_layers[layer].getWidth() + 1) / 2,
+                            (m_layers[layer].getHeight() + 1) / 2,
+                            m_layers[layer].getChannelsCount());
 
         constexpr int KRadius = 2;
-        for(int x = 0; x < reduced_image.getWidth(); x++)
+        for(int y = 0; y < reduced_image.getHeight(); y++)
         {
-            for(int y = 0; y < reduced_image.getHeight(); y++)
+            for(int x = 0; x < reduced_image.getWidth(); x++)
             {
                 std::vector<Pixel> neighbors;
                 for(int x_axis_neighbor = 2 * x - KRadius; x_axis_neighbor != 2 * x + KRadius; x_axis_neighbor++)
                 {
                     for(int y_axis_neighbor = 2 * y - KRadius; y_axis_neighbor != 2 * y + KRadius; y_axis_neighbor++)
                     {
-                        if(x_axis_neighbor >= 0 && x_axis_neighbor < original_image.getWidth() &&
-                        y_axis_neighbor >= 0 && y_axis_neighbor < original_image.getHeight())
+                        if(x_axis_neighbor >= 0 && x_axis_neighbor < m_layers[layer].getWidth() &&
+                        y_axis_neighbor >= 0 && y_axis_neighbor < m_layers[layer].getHeight())
                         {
-                            neighbors.push_back(original_image.getPixel(x_axis_neighbor, y_axis_neighbor));
+                            neighbors.push_back(m_layers[layer].getPixel(x_axis_neighbor, y_axis_neighbor));
                         }
                     }
                 }
@@ -52,17 +51,16 @@ namespace retouch
         return reduced_image;
     }
 
-    Image retouch::GaussianPyramid::expand(const retouch::Image &original_image)
+    Image GaussianPyramid::expand(size_t layer)
     {
-        Image expanded_image(original_image.getWidth() * 2,
-                            original_image.getHeight() * 2,
-                            original_image.getBitDepth(),
-                            original_image.getChannelsCount());
+        Image expanded_image(m_layers[layer - 1].getWidth(),
+                             m_layers[layer - 1].getHeight(),
+                             m_layers[layer].getChannelsCount());
 
         constexpr int KRadius = 2;
-        for(int x = 0; x < expanded_image.getWidth(); x++)
+        for(int y = 0; y < expanded_image.getHeight(); y++)
         {
-            for (int y = 0; y < expanded_image.getHeight(); y++)
+            for (int x = 0; x < expanded_image.getWidth(); x++)
             {
                 std::vector<Pixel> neighbors;
                 for(int i = -KRadius; i <= KRadius; i++)
@@ -70,9 +68,9 @@ namespace retouch
                     for(int j = -KRadius; j <= KRadius; j++)
                     {
                         if((x - i) % 2 == 0 && (y - j) % 2 == 0 &&
-                                (x - i) / 2 > 0 && (x - i) / 2 < original_image.getWidth() &&
-                                (y - j) / 2 > 0 && (y - j) / 2 < original_image.getHeight())
-                        neighbors.push_back(original_image.getPixel((x - i) / 2, (y - j) / 2));
+                                (x - i) / 2 > 0 && (x - i) / 2 < m_layers[layer].getWidth() &&
+                                (y - j) / 2 > 0 && (y - j) / 2 < m_layers[layer].getHeight())
+                        neighbors.push_back(m_layers[layer].getPixel((x - i) / 2, (y - j) / 2));
                     }
                 }
                 Pixel new_pixel{0,0,0,UCHAR_MAX};
