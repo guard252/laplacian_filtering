@@ -11,7 +11,7 @@ namespace retouch
         return{std::clamp(int(pixel.r * multiplier), 0, UCHAR_MAX),
                std::clamp(int(pixel.g * multiplier), 0, UCHAR_MAX),
                std::clamp(int(pixel.b * multiplier), 0, UCHAR_MAX),
-               static_cast<unsigned char>(UCHAR_MAX)};
+               UCHAR_MAX};
     }
     inline Pixel pixelDivision(Pixel pixel, double divider)
     {
@@ -22,9 +22,9 @@ namespace retouch
     }
     inline Pixel pixelSubtraction(Pixel first, Pixel second)
     {
-        return {(int(first.r) - second.r),
-                (int(first.g) - second.g),
-                (int(first.b) - second.b),
+        return {(first.r - second.r),
+                (first.g - second.g),
+                (first.b - second.b),
                 UCHAR_MAX};
     }
     inline Pixel pixelSum(Pixel first, Pixel second)

@@ -36,6 +36,8 @@ namespace retouch
 
         Image operator-(const Image& other)const;
 
+        Image operator+(const Image& other)const;
+
         Pixel getPixel(size_t x, size_t y) const
         {
             assert(x < m_width && y < m_height);

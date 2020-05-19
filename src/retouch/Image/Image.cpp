@@ -61,5 +61,23 @@ namespace retouch
         return difference;
     }
 
+    Image Image::operator+(const Image &other) const
+    {
+        assert(m_width == other.m_width &&
+               m_height == other.m_height &&
+               m_channels_count == other.m_channels_count);
+
+        Image sum(m_width, m_height, m_channels_count);
+        for(int y = 0; y < m_height; y++)
+        {
+            for(int x = 0; x < m_width; x++)
+            {
+                Pixel pixel_sum = pixelSum(getPixel(x, y), other.getPixel(x, y));
+                sum.setPixel(x, y, pixel_sum);
+            }
+        }
+        return sum;
+    }
+
 }
 
