@@ -5,7 +5,7 @@
 
 namespace retouch
 {
-    class LaplacianPyramid : IPyramid
+    class LaplacianPyramid : public IPyramid
     {
         GaussianPyramid m_gaussian_pyramid;
 
@@ -19,6 +19,9 @@ namespace retouch
 
         const Image& operator[](size_t index) const override { return m_layers.at(index); }
 
+        Image expand(const Image& image, size_t layer_to_correspond) const;
+
+        Image reconstructImage() const;
     };
 }
 

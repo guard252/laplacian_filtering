@@ -24,9 +24,9 @@ namespace retouch
         const Image& operator[](size_t index) const override { return m_layers.at(index); }
 
     public:
-        Image reduce(size_t layer);
+        Image reduce(size_t layer_index);
 
-        Image expand(size_t layer);
+        Image expand(size_t layer_index);
     };
 }
 
