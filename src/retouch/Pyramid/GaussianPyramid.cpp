@@ -30,21 +30,24 @@ namespace retouch
         {
             for(int x = 0; x < reduced_image.getWidth(); x++)
             {
-                std::vector<Pixel> neighbors;
-                for(int x_axis_neighbor = 2 * x - KRadius; x_axis_neighbor != 2 * x + KRadius; x_axis_neighbor++)
+                const size_t left_bound_x = std::max(x - KRadius, 0) * 2;
+                const size_t left_bound_y = std::max(y - KRadius, 0) * 2;
+                const size_t right_bound_x = std::min<unsigned>(x + KRadius, reduced_image.getWidth() - 1) * 2;
+                const size_t right_bound_y = std::min<unsigned>(y + KRadius, reduced_image.getHeight() - 1) * 2;
+
+                Pixel new_pixel{0,0,0,UCHAR_MAX};
+
+                int num_of_neighbors = ((right_bound_x - left_bound_x) + 1) * ((right_bound_y - left_bound_y) + 1);
+
+
+                for(int j = left_bound_y; j != right_bound_y; j++)
                 {
-                    for(int y_axis_neighbor = 2 * y - KRadius; y_axis_neighbor != 2 * y + KRadius; y_axis_neighbor++)
-                    {
-                        if(x_axis_neighbor >= 0 && x_axis_neighbor < m_layers[layer_index].getWidth() &&
-                        y_axis_neighbor >= 0 && y_axis_neighbor < m_layers[layer_index].getHeight())
+                    for(int i = left_bound_x; i != right_bound_x; i++)
                         {
-                            neighbors.push_back(m_layers[layer_index].getPixel(x_axis_neighbor, y_axis_neighbor));
-                        }
+                        new_pixel = pixelSum(new_pixel, pixelDivision(m_layers[layer_index].getPixel(i, j), num_of_neighbors));
                     }
                 }
-                Pixel new_pixel{0,0,0,0};
-                std::for_each(neighbors.begin(), neighbors.end(), [&](Pixel& a){a = pixelDivision(a, neighbors.size());
-                new_pixel = pixelSum(new_pixel, a);});
+
                 reduced_image.setPixel(x, y, new_pixel);
             }
         }
@@ -62,22 +65,22 @@ namespace retouch
         {
             for (int x = 0; x < expanded_image.getWidth(); x++)
             {
-                std::vector<Pixel> neighbors;
-                for(int i = -KRadius; i <= KRadius; i++)
+                const size_t left_bound_x = static_cast<unsigned>((std::max(x - KRadius, KRadius)) + 1) & ~ 1;
+                const size_t left_bound_y = static_cast<unsigned>((std::max(y - KRadius, KRadius)) + 1) & ~ 1;
+                const size_t right_bound_x = std::min<unsigned>(x + KRadius, expanded_image.getWidth() - 1) / 2 * 2;
+                const size_t right_bound_y = std::min<unsigned>(y + KRadius, expanded_image.getHeight() - 1) / 2 * 2;
+                Pixel new_pixel{0,0,0,UCHAR_MAX};
+
+                int num_of_neighbors = ((right_bound_x - left_bound_x) / 2 + 1) * ((right_bound_y - left_bound_y) / 2 + 1);
+
+                for(int i = left_bound_y; i <= right_bound_y; i += 2)
                 {
-                    for(int j = -KRadius; j <= KRadius; j++)
+                    for(int j = left_bound_x; j <= right_bound_x; j += 2)
                     {
-                        if((x - i) % 2 == 0 && (y - j) % 2 == 0 &&
-                                (x - i) / 2 > 0 && (x - i) / 2 < m_layers[layer_index].getWidth() &&
-                                (y - j) / 2 > 0 && (y - j) / 2 < m_layers[layer_index].getHeight())
-                        neighbors.push_back(m_layers[layer_index].getPixel((x - i) / 2, (y - j) / 2));
+                        new_pixel = pixelSum(new_pixel, pixelDivision( m_layers[layer_index].getPixel(j / 2, i / 2), num_of_neighbors));
                     }
                 }
-                Pixel new_pixel{0,0,0,UCHAR_MAX};
-                std::for_each(neighbors.begin(), neighbors.end(), [&](Pixel& a){
-                    a = pixelDivision(a, neighbors.size());
-                    new_pixel = pixelSum(new_pixel, a);
-                });
+
                 expanded_image.setPixel(x, y, new_pixel);
             }
         }
