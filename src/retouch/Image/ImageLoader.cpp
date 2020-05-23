@@ -10,7 +10,7 @@ namespace retouch
 
     Image ImageLoader::loadPNG(std::string_view path) const
     {
-        const size_t KChannels_count = 4;
+        constexpr size_t KChannels_count = 4;
 
 
         png_image image = {};
