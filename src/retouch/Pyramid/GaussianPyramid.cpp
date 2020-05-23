@@ -4,10 +4,16 @@
 
 namespace retouch
 {
-    GaussianPyramid::GaussianPyramid(const Image &image) : m_layers{image}{}
+    GaussianPyramid::GaussianPyramid(const Image &image) : m_layers{image}
+    {
+        build();
+    }
 
     GaussianPyramid::GaussianPyramid(Image&& first_layer):
-    m_layers{first_layer}{}
+    m_layers{first_layer}
+    {
+        build();
+    }
 
 
     void GaussianPyramid::build()
@@ -31,16 +37,16 @@ namespace retouch
             for(int x = 0; x < reduced_image.getWidth(); x++)
             {
                 const size_t left_bound_x = std::max(x - KRadius, 0) * 2;
-                const size_t left_bound_y = std::max(y - KRadius, 0) * 2;
+                const size_t top_bound_y = std::max(y - KRadius, 0) * 2;
                 const size_t right_bound_x = std::min<unsigned>(x + KRadius, reduced_image.getWidth() - 1) * 2;
-                const size_t right_bound_y = std::min<unsigned>(y + KRadius, reduced_image.getHeight() - 1) * 2;
+                const size_t bottom_bound_y = std::min<unsigned>(y + KRadius, reduced_image.getHeight() - 1) * 2;
 
                 Pixel new_pixel{0,0,0,UCHAR_MAX};
 
-                int num_of_neighbors = ((right_bound_x - left_bound_x) + 1) * ((right_bound_y - left_bound_y) + 1);
+                int num_of_neighbors = ((right_bound_x - left_bound_x) + 1) * ((bottom_bound_y - top_bound_y) + 1);
 
 
-                for(int j = left_bound_y; j != right_bound_y; j++)
+                for(int j = top_bound_y; j != bottom_bound_y; j++)
                 {
                     for(int i = left_bound_x; i != right_bound_x; i++)
                         {
@@ -66,14 +72,14 @@ namespace retouch
             for (int x = 0; x < expanded_image.getWidth(); x++)
             {
                 const size_t left_bound_x = static_cast<unsigned>((std::max(x - KRadius, KRadius)) + 1) & ~ 1;
-                const size_t left_bound_y = static_cast<unsigned>((std::max(y - KRadius, KRadius)) + 1) & ~ 1;
+                const size_t top_bound_y = static_cast<unsigned>((std::max(y - KRadius, KRadius)) + 1) & ~ 1;
                 const size_t right_bound_x = std::min<unsigned>(x + KRadius, expanded_image.getWidth() - 1) / 2 * 2;
-                const size_t right_bound_y = std::min<unsigned>(y + KRadius, expanded_image.getHeight() - 1) / 2 * 2;
+                const size_t bottom_bound_y = std::min<unsigned>(y + KRadius, expanded_image.getHeight() - 1) / 2 * 2;
                 Pixel new_pixel{0,0,0,UCHAR_MAX};
 
-                int num_of_neighbors = ((right_bound_x - left_bound_x) / 2 + 1) * ((right_bound_y - left_bound_y) / 2 + 1);
+                int num_of_neighbors = ((right_bound_x - left_bound_x) / 2 + 1) * ((bottom_bound_y - top_bound_y) / 2 + 1);
 
-                for(int i = left_bound_y; i <= right_bound_y; i += 2)
+                for(int i = top_bound_y; i <= bottom_bound_y; i += 2)
                 {
                     for(int j = left_bound_x; j <= right_bound_x; j += 2)
                     {

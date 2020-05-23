@@ -5,19 +5,22 @@
 
 namespace retouch
 {
-    class LaplacianPyramid : public IPyramid
+    class LaplacianPyramid
     {
-        GaussianPyramid m_gaussian_pyramid;
 
         std::vector<Image> m_layers;
+    private:
+        void build(const Image& image);
     public:
+
         LaplacianPyramid(const Image& first_layer);
 
-        void build() override;
+        // Builds an empty pyramid with layers_count layers
+        LaplacianPyramid(const Image& image, size_t layers_count);
 
-        const std::vector<Image>&  getLayers() const override { return m_layers; }
+        const std::vector<Image>&  getLayers() const { return m_layers; }
 
-        const Image& operator[](size_t index) const override { return m_layers.at(index); }
+        const Image& operator[](size_t index) const { return m_layers.at(index); }
 
         Image expand(const Image& image, size_t layer_to_correspond) const;
 

@@ -3,17 +3,32 @@
 namespace retouch
 {
 
-    LaplacianPyramid::LaplacianPyramid(const Image &first_layer) : m_gaussian_pyramid(first_layer){}
-
-    void LaplacianPyramid::build()
+    LaplacianPyramid::LaplacianPyramid(const Image &first_layer)
     {
-        m_gaussian_pyramid.build();
-        for(int layer = 0; layer != m_gaussian_pyramid.getLayers().size() - 1; layer++)
+        build(first_layer);
+    }
+
+    LaplacianPyramid::LaplacianPyramid(const Image& image, size_t layers_count)
+    {
+        size_t width = image.getWidth();
+        size_t height = image.getHeight();
+        for(int layer = 0; layer != layers_count; layer++)
         {
-            Image reduced_and_expanded = m_gaussian_pyramid.expand(layer + 1);;
-            m_layers.push_back(m_gaussian_pyramid[layer] - reduced_and_expanded);
+            m_layers.push_back(Image(width, height, image.getChannelsCount()));
+            width = (width + 1) / 2;
+            height = (height + 1) / 2;
         }
-        m_layers.push_back(m_gaussian_pyramid.getLayers().back());
+    }
+
+    void LaplacianPyramid::build(const Image& image)
+    {
+        GaussianPyramid gaussian_pyramid(image);
+        for(int layer = 0; layer != gaussian_pyramid.getLayers().size() - 1; layer++)
+        {
+            Image reduced_and_expanded = gaussian_pyramid.expand(layer + 1);;
+            m_layers.push_back(gaussian_pyramid[layer] - reduced_and_expanded);
+        }
+        m_layers.push_back(gaussian_pyramid.getLayers().back());
     }
 
     Image LaplacianPyramid::reconstructImage() const
@@ -42,14 +57,14 @@ namespace retouch
             for (int x = 0; x < expanded_image.getWidth(); x++)
             {
                 const size_t left_bound_x = static_cast<unsigned>((std::max(x - KRadius, KRadius)) + 1) & ~ 1;
-                const size_t left_bound_y = static_cast<unsigned>((std::max(y - KRadius, KRadius)) + 1) & ~ 1;
+                const size_t top_bound_y = static_cast<unsigned>((std::max(y - KRadius, KRadius)) + 1) & ~ 1;
                 const size_t right_bound_x = std::min<unsigned>(x + KRadius, expanded_image.getWidth() - 1) / 2 * 2;
-                const size_t right_bound_y = std::min<unsigned>(y + KRadius, expanded_image.getHeight() - 1) / 2 * 2;
+                const size_t bottom_bound_y = std::min<unsigned>(y + KRadius, expanded_image.getHeight() - 1) / 2 * 2;
                 Pixel new_pixel{0,0,0,UCHAR_MAX};
 
-                int num_of_neighbors = ((right_bound_x - left_bound_x) / 2 + 1) * ((right_bound_y - left_bound_y) / 2 + 1);
+                int num_of_neighbors = ((right_bound_x - left_bound_x) / 2 + 1) * ((bottom_bound_y - top_bound_y) / 2 + 1);
 
-                for(int i = left_bound_y; i <= right_bound_y; i += 2)
+                for(int i = top_bound_y; i <= bottom_bound_y; i += 2)
                 {
                     for(int j = left_bound_x; j <= right_bound_x; j += 2)
                     {
@@ -62,4 +77,6 @@ namespace retouch
         }
         return expanded_image;
     }
+
+
 }
