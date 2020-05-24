@@ -81,38 +81,41 @@ namespace retouch
 
     void Image::setSubImage(const Image &subimage, const glm::ivec2 &start, const glm::ivec2 &end)
     {
-        int subimage_width = end.x - start.x;
-        int subimage_height = end.y - start.y;
-        assert(subimage_width == subimage.m_width &&
-               subimage_height == subimage.m_height &&
+        int KSubimage_width = end.x - start.x + 1;
+        int KSubimage_height = end.y - start.y + 1;
+        assert(KSubimage_width == subimage.m_width &&
+               KSubimage_height == subimage.m_height &&
                start.x >= 0 && start.x < m_width &&
                end.x >= 0 && end.x < m_width &&
                start.y >= 0 && start.y < m_height &&
                end.y >= 0 && end.y < m_height);
-        short* subimage_start = m_pixel_data.get() + start.y * m_width + start.x;
-        for(size_t i = 0; i < subimage_height; i++)
+        short* subimage_start = m_pixel_data.get() + (start.y * m_width + start.x) * m_channels_count;
+        for(size_t i = 0; i < KSubimage_height; i++)
         {
-            std::copy(subimage.m_pixel_data.get() + (i * subimage_width) * m_channels_count,
-                      subimage.m_pixel_data.get() + (i + 1) * (subimage_width) * m_channels_count,
+            std::copy(subimage.m_pixel_data.get() + (i * KSubimage_width) * m_channels_count,
+                      subimage.m_pixel_data.get() + (i + 1) * (KSubimage_width) * m_channels_count,
                       subimage_start + i * m_width * m_channels_count);
         }
     }
 
-    Image Image::getSubImage(const glm::ivec2 &start, const glm::ivec2 &end)
+    Image Image::getSubImage(const glm::ivec2 &start, const glm::ivec2 &end) const
     {
-        const int KSubimage_width = end.x - start.x;
-        const int KSubimage_height = end.y - start.y;
         assert(start.x >= 0 && start.x < m_width &&
                end.x >= 0 && end.x < m_width &&
                start.y >= 0 && start.y < m_height &&
                end.y >= 0 && end.y < m_height);
+
+        const int KSubimage_width = end.x - start.x + 1;
+        const int KSubimage_height = end.y - start.y + 1;
+        short* subimage_start = m_pixel_data.get() + (start.y * m_width + start.x) * m_channels_count;
+
         Image subimage(KSubimage_width, KSubimage_height, m_channels_count);
-        short* subimage_start = m_pixel_data.get() + start.y * m_width + start.x;
         for(size_t i = 0; i < KSubimage_height; i++)
         {
-            std::copy(subimage_start + (i * m_width) * m_channels_count,
+            int count = subimage_start + (i * m_width + KSubimage_width) * m_channels_count - (subimage_start + i * m_width * m_channels_count);
+            std::copy(subimage_start + i * m_width * m_channels_count,
                       subimage_start + (i * m_width + KSubimage_width) * m_channels_count,
-                      subimage.m_pixel_data.get() + (i * KSubimage_width) * m_channels_count);
+                      subimage.m_pixel_data.get() + i * KSubimage_width * m_channels_count);
         }
         return subimage;
     }

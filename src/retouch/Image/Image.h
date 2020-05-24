@@ -36,7 +36,7 @@ namespace retouch
 
         void setSubImage(const Image& subimage, const glm::ivec2& start, const glm::ivec2& end);
 
-        Image getSubImage(const glm::ivec2& start, const glm::ivec2& end);
+        Image getSubImage(const glm::ivec2& start, const glm::ivec2& end)const;
 
         Image operator-(const Image& other)const;
 
