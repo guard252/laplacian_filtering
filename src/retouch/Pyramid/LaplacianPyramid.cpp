@@ -10,14 +10,13 @@ namespace retouch
 
     LaplacianPyramid::LaplacianPyramid(const Image& image, size_t layers_count)
     {
-        size_t width = image.getWidth();
-        size_t height = image.getHeight();
-        for(int layer = 0; layer != layers_count; layer++)
+        GaussianPyramid gaussian_pyramid(image);
+        for(int layer = 0; layer != gaussian_pyramid.getLayers().size() - 1 && layer != layers_count - 1; layer++)
         {
-            m_layers.push_back(Image(width, height, image.getChannelsCount()));
-            width = (width + 1) / 2;
-            height = (height + 1) / 2;
+            Image reduced_and_expanded = gaussian_pyramid.expand(layer + 1);;
+            m_layers.push_back(gaussian_pyramid[layer] - reduced_and_expanded);
         }
+        m_layers.push_back(gaussian_pyramid.getLayers().back());
     }
 
     void LaplacianPyramid::build(const Image& image)
@@ -76,6 +75,21 @@ namespace retouch
             }
         }
         return expanded_image;
+    }
+
+    void LaplacianPyramid::setLayerSubImage(size_t layer, const Image &img, glm::ivec2 start, glm::ivec2 end)
+    {
+        m_layers[layer].setSubImage(img, start, end);
+    }
+
+    LaplacianPyramid::LaplacianPyramid(size_t width, size_t height, size_t channels_count, size_t layers_count)
+    {
+        for(int layer = 0; layer != layers_count; layer++)
+        {
+            m_layers.push_back(Image(width, height, channels_count));
+            width = (width + 1) / 2;
+            height = (height + 1) / 2;
+        }
     }
 
 

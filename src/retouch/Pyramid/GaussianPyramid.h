@@ -26,6 +26,10 @@ namespace retouch
         Image reduce(size_t layer_index);
 
         Image expand(size_t layer_index);
+
+        Image expandImageAsLayer(const Image& image, size_t layer_index)const;
+
+        Image expandToLayer(size_t layer_to_expand, size_t layer_to_coincide)const;
     };
 }
 

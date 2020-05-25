@@ -42,4 +42,13 @@ namespace retouch
                  std::clamp<double>(std::pow(pixel.b, power), 0, UCHAR_MAX),
                  UCHAR_MAX };
     }
+
+    inline glm::vec3 operator*(glm::vec3 vec, const double& value)
+    {
+        return {vec.r * value, vec.g * value, vec.b * value};
+    }
+    inline glm::vec3 operator/(glm::vec3 vec, const double& value)
+    {
+        return {vec.r / value, vec.g / value, vec.b / value};
+    }
 }

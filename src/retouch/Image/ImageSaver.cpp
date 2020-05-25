@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <algorithm>
+#include <cstring>
 
 #include "png.h"
 
@@ -13,7 +14,7 @@ namespace retouch
         png_structp png_ptr;
         png_infop info_ptr;
         png_byte ** row_pointers = nullptr;
-        constexpr size_t bit_depth = 8;
+        constexpr size_t KBit_depth = 8;
 
         fp = std::fopen(path.data(), "wb");
         if(fp == nullptr)
@@ -48,7 +49,7 @@ namespace retouch
                 info_ptr,
                 image_data.getWidth(),
                 image_data.getHeight(),
-                bit_depth,
+                KBit_depth,
                 PNG_COLOR_TYPE_RGBA,
                 PNG_INTERLACE_NONE,
                 PNG_COMPRESSION_TYPE_DEFAULT,
@@ -58,7 +59,7 @@ namespace retouch
         std::unique_ptr<unsigned char[]> buffer = std::make_unique<unsigned char[]>(buffer_size);
         for(size_t i = 0; i  < buffer_size; i++)
         {
-            buffer[i] = std::clamp(int(image_data.getPixelData()[i]), 0, UCHAR_MAX);
+            buffer[i] = std::clamp(int(*(image_data.getPixelData().get() + i)), 0, UCHAR_MAX);
         }
 
         row_pointers = (png_byte**)png_malloc (png_ptr, image_data.getHeight() * sizeof (png_byte*));
