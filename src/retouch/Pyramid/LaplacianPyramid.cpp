@@ -92,5 +92,13 @@ namespace retouch
         }
     }
 
+    void LaplacianPyramid::setLayer(size_t layer, const Image &image)
+    {
+        assert(m_layers[layer].getWidth() == image.getWidth() &&
+        m_layers[layer].getHeight() == image.getHeight() &&
+        m_layers[layer].getChannelsCount() == image.getChannelsCount());
+        m_layers[layer] = image;
+    }
+
 
 }

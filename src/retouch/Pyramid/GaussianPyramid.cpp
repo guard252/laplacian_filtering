@@ -32,15 +32,15 @@ namespace retouch
                             (m_layers[layer_index].getHeight() + 1) / 2,
                              m_layers[layer_index].getChannelsCount());
 
-        constexpr int KRadius = 1;
+        constexpr int KRadius = 2;
         for(int y = 0; y < reduced_image.getHeight(); y++)
         {
             for(int x = 0; x < reduced_image.getWidth(); x++)
             {
                 const size_t left_bound_x = std::max(2 * x - KRadius, 0);
                 const size_t top_bound_y = std::max(2 * y - KRadius, 0);
-                const size_t right_bound_x = std::min<unsigned>(2 * x + KRadius, m_layers[layer_index - 1].getWidth() - 1);
-                const size_t bottom_bound_y = std::min<unsigned>(2 * y + KRadius, m_layers[layer_index - 1].getHeight() - 1);
+                const size_t right_bound_x = std::min<unsigned>(2 * x + KRadius, m_layers[layer_index].getWidth() - 1);
+                const size_t bottom_bound_y = std::min<unsigned>(2 * y + KRadius, m_layers[layer_index].getHeight() - 1);
 
                 Pixel new_pixel{0,0,0,UCHAR_MAX};
 
@@ -96,6 +96,7 @@ namespace retouch
 
     Image GaussianPyramid::expandToLayer(size_t layer_to_expand, size_t layer_to_coincide) const
     {
+        if(layer_to_expand == layer_to_coincide) return m_layers[layer_to_coincide];
         assert(layer_to_expand > layer_to_coincide &&
                layer_to_expand < m_layers.size() &&
                layer_to_coincide >= 0);
@@ -103,10 +104,7 @@ namespace retouch
         std::vector<Image> expanded_layers{m_layers[layer_to_expand]};
         while(expanded_layers.back().getHeight() != m_layers[layer_to_coincide].getHeight())
         {
-            ImageSaver saver;
-            saver.savePNG(m_layers[1], "../images/output_images/layer0.png");
             expanded_layers.push_back(expandImageAsLayer(expanded_layers.back(), layer_to_expand--));
-
         }
         return expanded_layers.back();
     }

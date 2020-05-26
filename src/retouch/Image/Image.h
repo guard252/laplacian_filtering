@@ -23,6 +23,7 @@ namespace retouch
         //This ctor generates an image with every buffer bit set to 1
         Image(size_t width, size_t height,
               size_t channels_count = KDefault_channels_count);
+        Image operator=(const Image& other);
 
         const std::unique_ptr<short[]>& getPixelData() const { return m_pixel_data; }
 

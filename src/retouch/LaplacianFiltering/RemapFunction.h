@@ -17,6 +17,8 @@ namespace retouch
     private:
         double computeTau(const double& pixel) const;
 
+        double computeIntensity(const Pixel& pixel) const;
+
         Pixel remapPixel(const Pixel& original_pixel, const Pixel& gaussian_pixel) const;
 
         double remapEdges(const double& delta) const;

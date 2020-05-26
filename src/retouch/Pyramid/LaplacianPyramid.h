@@ -26,6 +26,8 @@ namespace retouch
 
         void setLayerSubImage(size_t layer, const Image& img, glm::ivec2 start,glm::ivec2 end);
 
+        void setLayer(size_t layer, const Image& image);
+
         Image expand(const Image& image, size_t layer_to_correspond) const;
 
         Image reconstructImage() const;

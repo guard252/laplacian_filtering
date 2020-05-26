@@ -2,20 +2,24 @@
 #include "retouch/Image/ImageLoader.h"
 #include "retouch/Image/ImageSaver.h"
 #include "retouch/Pyramid/LaplacianPyramid.h"
-
+#include "retouch/LaplacianFiltering/LocalLaplacianFilter.h"
+#include "thread"
 int main()
 {
     retouch::ImageLoader loader;
     retouch::ImageSaver saver;
+    retouch::LocalLaplacianFilter filter;
+    const double KAlpha = 4;
+    const double KBeta = 1;
+    const double KSigma = 0.8;
     try
     {
-        retouch::Image layer_1 = loader.loadPNG("../images/input_images/flower.png");
-        retouch::LaplacianPyramid pyramid(layer_1);
-        pyramid.build();
-        auto reconstructed = pyramid.reconstructImage();
-        int current_layer = 0;
-        std::string file_path = "../images/output_images/reconstructed_flower_" + std::to_string(current_layer++) + ".png";
-        saver.savePNG(reconstructed, file_path);
+        retouch::Image image(loader.loadPNG("../images/input_images/flower.png"));
+        retouch::Image filtered_image = filter.apply(image, KAlpha, KBeta, KSigma);
+        //image.setSubImage(image.getSubImage( {0, 0}, {399, 265}), {0, 0}, {399, 265});
+
+        std::string file_path = "../images/output_images/detailed_flower.png";
+        saver.savePNG(filtered_image, file_path);
 
     }
     catch(std::runtime_error& e)

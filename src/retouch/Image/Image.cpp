@@ -1,6 +1,7 @@
 #include <cassert>
 
 #include "Image.h"
+#include "../Image/ImageSaver.h"
 
 namespace retouch
 {
@@ -78,14 +79,11 @@ namespace retouch
         }
         return sum;
     }
-
     void Image::setSubImage(const Image &subimage, const glm::ivec2 &start, const glm::ivec2 &end)
     {
         int KSubimage_width = end.x - start.x + 1;
         int KSubimage_height = end.y - start.y + 1;
-        assert(KSubimage_width == subimage.m_width &&
-               KSubimage_height == subimage.m_height &&
-               start.x >= 0 && start.x < m_width &&
+        assert(start.x >= 0 && start.x < m_width &&
                end.x >= 0 && end.x < m_width &&
                start.y >= 0 && start.y < m_height &&
                end.y >= 0 && end.y < m_height);
@@ -93,9 +91,11 @@ namespace retouch
         for(size_t i = 0; i < KSubimage_height; i++)
         {
             std::copy(subimage.m_pixel_data.get() + (i * KSubimage_width) * m_channels_count,
-                      subimage.m_pixel_data.get() + (i + 1) * (KSubimage_width) * m_channels_count,
+                      subimage.m_pixel_data.get() + (i + 1) * KSubimage_width * m_channels_count,
                       subimage_start + i * m_width * m_channels_count);
+
         }
+
     }
 
     Image Image::getSubImage(const glm::ivec2 &start, const glm::ivec2 &end) const
@@ -118,6 +118,15 @@ namespace retouch
                       subimage.m_pixel_data.get() + i * KSubimage_width * m_channels_count);
         }
         return subimage;
+    }
+
+    Image Image::operator=(const Image &other)
+    {
+        m_pixel_data = std::move(other.getPixelDataCopy());
+        m_width = other.m_width;
+        m_height = other.m_height;
+        m_channels_count = other.m_channels_count;
+       return *this;
     }
 
 }
