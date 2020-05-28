@@ -2,12 +2,18 @@
 
 #include "GaussianPyramid.h"
 #include "../Image/ImageSaver.h"
-
+#include "../Others/Exceptions.h"
 namespace retouch
 {
     GaussianPyramid::GaussianPyramid(const Image &image) : m_layers{image}
     {
         build();
+    }
+
+    GaussianPyramid::GaussianPyramid(const Image &image, size_t num_of_layers):
+    m_layers{image}
+    {
+        build(num_of_layers);
     }
 
     GaussianPyramid::GaussianPyramid(Image&& first_layer):
@@ -16,11 +22,32 @@ namespace retouch
         build();
     }
 
+    GaussianPyramid::GaussianPyramid(Image&& first_layer, size_t num_of_layers):
+            m_layers{first_layer}
+    {
+        build(num_of_layers);
+    }
+
 
     void GaussianPyramid::build()
     {
         while((m_layers.back().getHeight() + 1) / 2 > KMin_image_resolution &&
                 (m_layers.back().getWidth() + 1) / 2 > KMin_image_resolution)
+        {
+            m_layers.push_back(reduce(m_layers.size() - 1));
+        }
+    }
+
+    void GaussianPyramid::build(int num_of_layers)
+    {
+        if(m_layers[0].getHeight() < KMin_image_resolution * pow(2, num_of_layers) ||
+        m_layers[0].getWidth() < KMin_image_resolution * pow(2, num_of_layers))
+        {
+            std::string message = "Image size must be at least" +
+                    std::to_string(KMin_image_resolution * pow(2, num_of_layers)) + "pixels height, width";
+            throw ImageSizeTooSmallException(message);
+        }
+        while(--num_of_layers != 0)
         {
             m_layers.push_back(reduce(m_layers.size() - 1));
         }
@@ -145,5 +172,7 @@ namespace retouch
         }
         return expanded_image;
     }
+
+
 
 }

@@ -7,16 +7,22 @@ namespace retouch
 {
     class GaussianPyramid
     {
-        static constexpr size_t KMin_image_resolution{ 4 };
+        static constexpr size_t KMin_image_resolution{ 2 };
 
         std::vector<Image> m_layers;
 
         void build();
+
+        void build(int num_of_layers);
     public:
 
         GaussianPyramid(const Image& first_layer);
 
+        GaussianPyramid(const Image& first_layer, size_t num_of_layers);
+
         GaussianPyramid(Image&& first_layer);
+
+        GaussianPyramid(Image&& first_layer, size_t num_of_layers);
 
         const std::vector<Image>& getLayers() const { return m_layers; }
 

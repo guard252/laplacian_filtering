@@ -28,7 +28,7 @@ namespace retouch
     public:
         RemapFunction(const double &alpha, const double &beta, const double &sigma);
 
-        Image remap(const Image& input_image, const Image& gaussian_layer) const;
+        Image remap(const Image& input_image, glm::vec2 start, glm::vec2 end, const Pixel& gaussian_pixel) const;
     };
 }
 

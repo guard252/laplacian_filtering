@@ -9,9 +9,9 @@ int main()
     retouch::ImageLoader loader;
     retouch::ImageSaver saver;
     retouch::LocalLaplacianFilter filter;
-    const double KAlpha = 4;
+    const double KAlpha = 0.25;
     const double KBeta = 1;
-    const double KSigma = 0.8;
+    const double KSigma = 0.3;
     try
     {
         retouch::Image image(loader.loadPNG("../images/input_images/flower.png"));

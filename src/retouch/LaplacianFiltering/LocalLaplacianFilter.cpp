@@ -1,3 +1,4 @@
+#include <iostream>
 #include "LocalLaplacianFilter.h"
 #include "../Pyramid/LaplacianPyramid.h"
 #include "RemapFunction.h"
@@ -8,77 +9,50 @@ namespace retouch
     Image LocalLaplacianFilter::apply(const Image &image, const double &alpha,
                                                           const double &beta, const double &sigma) const
     {
-        GaussianPyramid gaussian_pyramid(image);
-        const size_t KGaussian_pyramid_size = gaussian_pyramid.getLayers().size();
-        const size_t KGaussian_laplacian_difference = 3;
-        const size_t KLaplacian_pyramid_size = KGaussian_pyramid_size - KGaussian_laplacian_difference;
-
+        const size_t KPypamid_size = 5;
+        GaussianPyramid gaussian_pyramid(image, KPypamid_size);
         LaplacianPyramid output_pyramid(image.getWidth(), image.getHeight(),
-                image.getChannelsCount(), KLaplacian_pyramid_size);
-
-        output_pyramid.setLayer(KLaplacian_pyramid_size - 1, gaussian_pyramid[KLaplacian_pyramid_size - 1]);
+                image.getChannelsCount(), KPypamid_size);
+        output_pyramid.setLayer(KPypamid_size - 1, gaussian_pyramid[KPypamid_size - 1]);
 
         RemapFunction remap_function(alpha, beta, sigma);
 
-        const size_t KSubimage_min_width = gaussian_pyramid[KLaplacian_pyramid_size - 2].getWidth() / 2;
-        const size_t KSubimage_min_height = gaussian_pyramid[KLaplacian_pyramid_size - 2].getHeight() / 2;
-
-        for(int layer_number = 0; layer_number < KLaplacian_pyramid_size - 1; layer_number++)
+        for(int layer_number = 0; layer_number < KPypamid_size - 1; layer_number++)
         {
-            const size_t KSubimages_on_axis = std::pow(2, layer_number + 1);
-            const size_t KOutput_layer_number = KLaplacian_pyramid_size - layer_number - 2;
-            Image gaussian_current_layer = gaussian_pyramid.expandToLayer(KOutput_layer_number, 0);
-            if(layer_number == 0)
-            {
-                Image cur = remap_function.remap(gaussian_pyramid[0], gaussian_current_layer);
-                ImageSaver saver;
-                saver.savePNG(cur, "../images/output_images/cur.png");
-            }
+            const size_t KGaussian_width = gaussian_pyramid[layer_number].getWidth();
+            const size_t KGaussian_height = gaussian_pyramid[layer_number].getHeight();
 
-            std::unordered_map subimages = divideIntoSubimages(image, KSubimages_on_axis);
-            std::unordered_map gaussian_subimages = divideIntoSubimages(gaussian_current_layer, KSubimages_on_axis);
+            const int KSubimage_size = 3 * ((pow(2, layer_number + 2)) - 1);
+            const int KSubimage_radius = KSubimage_size / 2;
 
-            size_t overall_width = 0;
-            for(int x = 0; x < KSubimages_on_axis; x++)
+            for(int y = 0; y < KGaussian_height; y++)
             {
-                size_t overall_height = 0;
-                int current_width;
-                for(int y = 0; y < KSubimages_on_axis; y++)
+                int y_in_full_resolution = y * pow(2,  layer_number);
+                int y_top_bound = std::max(y_in_full_resolution - KSubimage_radius, 0);
+                int y_bottom_bound = std::min<int>(y_in_full_resolution + KSubimage_radius, image.getHeight());
+                //if(y == KGaussian_height - 1) y_bottom_bound = image.getHeight();
+                for(int x = 0; x < KGaussian_width; x++)
                 {
-                     assert(subimages.find({x, y}) != subimages.end() &&
-                     gaussian_subimages.find({x, y}) != gaussian_subimages.end());
+                    std::cout << layer_number << " " << x << " " << y << "\n";
+                    int x_in_full_resolution = x * pow(2, layer_number);
 
-                    Image locally_good_image = remap_function.remap(subimages.find({x, y})->second, gaussian_subimages.find({x, y})->second);
-                    LaplacianPyramid temp_laplacian(locally_good_image);
+                    glm::ivec2 subimage_start = {std::max(x_in_full_resolution - KSubimage_radius, 0), y_top_bound};
+                    glm::ivec2 subimage_end = {std::min<int>(x_in_full_resolution + KSubimage_radius, image.getWidth()), y_bottom_bound};
 
-                    glm::vec2 start = {x * KSubimage_min_width, y * KSubimage_min_height};
-                    glm::vec2 end = {x * KSubimage_min_width + KSubimage_min_width - 1,
-                                     y * KSubimage_min_height + KSubimage_min_height - 1};
+                    Image remapped_subimage = remap_function.remap(image, subimage_start,
+                            subimage_end, gaussian_pyramid[layer_number].getPixel(x, y));
 
-//                    if(end.y >= output_pyramid[KOutput_layer_number].getHeight())
-//                        end.y = output_pyramid[KOutput_layer_number].getHeight() - 1;
-//                    if(end.x >= output_pyramid[KOutput_layer_number].getWidth())
-//                        end.x = output_pyramid[KOutput_layer_number].getWidth() - 1;
+                    LaplacianPyramid temp_laplacian(remapped_subimage);
 
+                    int new_x = (x_in_full_resolution - subimage_start.x) / pow(2, layer_number);
+                    int new_y = (y_in_full_resolution - subimage_start.y) / pow(2, layer_number);
+                    Pixel new_pixel = temp_laplacian[layer_number].getPixel(new_x, new_y);
+                    output_pyramid.setLayerPixel(layer_number, x, y, new_pixel);
 
-                    if(start.x < end.x && start.y < end.y)
-                    {
-                        output_pyramid.setLayerSubImage(KOutput_layer_number,
-                                                        temp_laplacian[temp_laplacian.getLayers().size() - 4], start, end);
-
-                    }
-                    current_width = temp_laplacian[temp_laplacian.getLayers().size() - 4].getWidth() - 1;
                 }
-                overall_width += current_width;
             }
-
-        }
-        for(int i = 0; i < output_pyramid.getLayers().size(); i++)
-        {
             ImageSaver saver;
-            saver.savePNG(output_pyramid[i],
-                              "../images/output_images/layer_" + std::to_string(i) + ".png");
-
+            saver.savePNG(output_pyramid[layer_number], "../images/output_images/layer_" + std::to_string(layer_number) + ".png");
 
         }
         return output_pyramid.reconstructImage();

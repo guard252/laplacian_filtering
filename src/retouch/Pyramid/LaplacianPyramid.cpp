@@ -100,5 +100,11 @@ namespace retouch
         m_layers[layer] = image;
     }
 
+    void LaplacianPyramid::setLayerPixel(size_t layer, size_t x, size_t y, const Pixel& pixel)
+    {
+        assert(layer < m_layers.size());
+        m_layers[layer].setPixel(x, y, pixel);
+    }
+
 
 }

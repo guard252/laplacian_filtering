@@ -40,15 +40,15 @@ namespace retouch
         }
     }
 
-    Image RemapFunction::remap(const Image& input_image, const Image& gaussian_layer) const
+    Image RemapFunction::remap(const Image& input_image, glm::vec2 start, glm::vec2 end, const Pixel& gaussian_pixel) const
     {
-        Image remapped_image(input_image.getWidth(), input_image.getHeight());
-        for(int y = 0; y < input_image.getHeight(); y++)
+        Image remapped_image(end.x - start.x + 1, end.y - start.y + 1);
+        for(int y = start.y; y < end.y; y++)
         {
-            for(int x = 0; x < input_image.getWidth(); x++)
+            for(int x = start.x; x < end.x; x++)
             {
-                Pixel remapped_pixel = remapPixel(input_image.getPixel(x, y), gaussian_layer.getPixel(x, y));
-                remapped_image.setPixel(x, y, remapped_pixel);
+                Pixel remapped_pixel = remapPixel(input_image.getPixel(x, y), gaussian_pixel);
+                remapped_image.setPixel(x - start.x, y - start.y, remapped_pixel);
             }
         }
         return remapped_image;
@@ -65,7 +65,7 @@ namespace retouch
         {
             delta = glm::normalize(delta);
         }
-        else return pixel;
+
 
         if(delta_magnitude < m_sigma)
         {
