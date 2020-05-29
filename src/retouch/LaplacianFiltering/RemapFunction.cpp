@@ -69,7 +69,7 @@ namespace retouch
 
         if(delta_magnitude < m_sigma)
         {
-            remapped_pixel = g + delta * m_sigma * pow(remapDetails(delta_magnitude / m_sigma), m_alpha);
+            remapped_pixel = g + delta * m_sigma * remapDetails(delta_magnitude / m_sigma);
         }
         else
         {

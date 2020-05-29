@@ -30,7 +30,6 @@ namespace retouch
                 int y_in_full_resolution = y * pow(2,  layer_number);
                 int y_top_bound = std::max(y_in_full_resolution - KSubimage_radius, 0);
                 int y_bottom_bound = std::min<int>(y_in_full_resolution + KSubimage_radius, image.getHeight());
-                //if(y == KGaussian_height - 1) y_bottom_bound = image.getHeight();
                 for(int x = 0; x < KGaussian_width; x++)
                 {
                     std::cout << layer_number << " " << x << " " << y << "\n";
