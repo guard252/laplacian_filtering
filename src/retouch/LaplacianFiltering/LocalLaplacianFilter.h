@@ -7,15 +7,20 @@
 
 #include "../Image/Image.h"
 #include "../Others/Hashing.h"
+#include "RemapFunction.h"
+#include "../Pyramid/LaplacianPyramid.h"
+
+
 
 namespace retouch
 {
     class LocalLaplacianFilter
     {
 
-        std::unordered_map<glm::ivec2, Image, Ivec2Hashing, Ivec2Hashing>
-                divideIntoSubimages(const Image& image, size_t count_on_axis) const;
-
+        void threadExecute(const GaussianPyramid& gaussian_pyramid,
+                LaplacianPyramid& output_pyramid,
+                const RemapFunction remap_function,
+                size_t num_of_threads, size_t current_thread) const;
 
     public:
         Image apply(const Image& image, const double& alpha,

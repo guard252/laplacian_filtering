@@ -3,7 +3,7 @@
 #include "retouch/Image/ImageSaver.h"
 #include "retouch/Pyramid/LaplacianPyramid.h"
 #include "retouch/LaplacianFiltering/LocalLaplacianFilter.h"
-#include "thread"
+#include "retouch/Others/Timer.h"
 int main()
 {
     retouch::ImageLoader loader;
@@ -12,13 +12,14 @@ int main()
     const double KAlpha = 0.25;
     const double KBeta = 0.25;
     const double KSigma = 0.5;
+    Timer timer;
     try
     {
-        retouch::Image image(loader.loadPNG("../images/input_images/room.png"));
+        retouch::Image image(loader.loadPNG("../images/input_images/flower.png"));
         retouch::Image filtered_image = filter.apply(image, KAlpha, KBeta, KSigma);
-        //image.setSubImage(image.getSubImage( {0, 0}, {399, 265}), {0, 0}, {399, 265});
 
-        std::string file_path = "../images/output_images/new_room.png";
+
+        std::string file_path = "../images/output_images/detailed_flower.png";
         saver.savePNG(filtered_image, file_path);
 
     }

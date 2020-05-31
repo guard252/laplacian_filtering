@@ -15,7 +15,7 @@ public:
     {
         auto duration = std::chrono::duration_cast<std::chrono::seconds>(
                 std::chrono::system_clock::now() - start).count();
-        std::cout << "The operation took " << duration << "seconds\n";
+        std::cout << "The operation took " << duration << " seconds\n";
     }
 };
 

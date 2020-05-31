@@ -13,8 +13,12 @@ add_executable(laplacian_pyramid
         src/retouch/Image/Image.cpp
         src/retouch/Image/Pixel.h
         src/retouch/Pyramid/GaussianPyramid.h
-        src/retouch/Pyramid/GaussianPyramid.cpp src/retouch/Pyramid/LaplacianPyramid.cpp src/retouch/Pyramid/LaplacianPyramid.h src/retouch/LaplacianFiltering/LocalLaplacianFilter.cpp src/retouch/LaplacianFiltering/LocalLaplacianFilter.h src/retouch/LaplacianFiltering/RemapFunction.cpp src/retouch/LaplacianFiltering/RemapFunction.h src/retouch/Others/Hashing.h src/retouch/Others/Exceptions.h)
+        src/retouch/Pyramid/GaussianPyramid.cpp src/retouch/Pyramid/LaplacianPyramid.cpp src/retouch/Pyramid/LaplacianPyramid.h src/retouch/LaplacianFiltering/LocalLaplacianFilter.cpp src/retouch/LaplacianFiltering/LocalLaplacianFilter.h src/retouch/LaplacianFiltering/RemapFunction.cpp src/retouch/LaplacianFiltering/RemapFunction.h src/retouch/Others/Hashing.h src/retouch/Others/Exceptions.h src/retouch/Others/Timer.h)
 
 include_directories(vendor/)
 
 target_link_libraries(laplacian_pyramid ${PROJECT_SOURCE_DIR}/vendor/libpng/lib/libpng.so)
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+target_link_libraries(laplacian_pyramid Threads::Threads)
