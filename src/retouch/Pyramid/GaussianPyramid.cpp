@@ -40,10 +40,10 @@ namespace retouch
 
     void GaussianPyramid::build(int num_of_layers)
     {
-        if(m_layers[0].getHeight() < KMin_image_resolution * pow(2, num_of_layers) ||
-        m_layers[0].getWidth() < KMin_image_resolution * pow(2, num_of_layers))
+        if(m_layers[0].getHeight() < KMin_image_resolution * pow(2, num_of_layers - 1) ||
+        m_layers[0].getWidth() < KMin_image_resolution * pow(2, num_of_layers - 1))
         {
-            std::string message = "Image size must be at least" +
+            std::string message = "Image size must be at least " +
                     std::to_string(KMin_image_resolution * pow(2, num_of_layers)) + "pixels height, width";
             throw ImageSizeTooSmallException(message);
         }
@@ -59,7 +59,7 @@ namespace retouch
                             (m_layers[layer_index].getHeight() + 1) / 2,
                              m_layers[layer_index].getChannelsCount());
 
-        constexpr int KRadius = 2;
+        constexpr int KRadius = 1;
         for(int y = 0; y < reduced_image.getHeight(); y++)
         {
             for(int x = 0; x < reduced_image.getWidth(); x++)
@@ -121,57 +121,7 @@ namespace retouch
         return expanded_image;
     }
 
-    Image GaussianPyramid::expandToLayer(size_t layer_to_expand, size_t layer_to_coincide) const
-    {
-        if(layer_to_expand == layer_to_coincide) return m_layers[layer_to_coincide];
-        assert(layer_to_expand > layer_to_coincide &&
-               layer_to_expand < m_layers.size() &&
-               layer_to_coincide >= 0);
 
-        std::vector<Image> expanded_layers{m_layers[layer_to_expand]};
-        while(expanded_layers.back().getHeight() != m_layers[layer_to_coincide].getHeight())
-        {
-            expanded_layers.push_back(expandImageAsLayer(expanded_layers.back(), layer_to_expand--));
-        }
-        return expanded_layers.back();
-    }
-
-    Image GaussianPyramid::expandImageAsLayer(const Image& image, size_t layer_index) const
-    {
-        assert(image.getWidth() == m_layers[layer_index].getWidth() &&
-        image.getHeight() == m_layers[layer_index].getHeight() &&
-        image.getChannelsCount() == m_layers[layer_index].getChannelsCount());
-
-        Image expanded_image(m_layers[layer_index - 1].getWidth(),
-                             m_layers[layer_index - 1].getHeight(),
-                             m_layers[layer_index - 1].getChannelsCount());
-
-        constexpr int KRadius = 2;
-        for(int y = 0; y < expanded_image.getHeight(); y++)
-        {
-            for (int x = 0; x < expanded_image.getWidth(); x++)
-            {
-                const size_t left_bound_x = static_cast<unsigned>((std::max(x - KRadius, KRadius)) + 1) & ~ 1;
-                const size_t top_bound_y = static_cast<unsigned>((std::max(y - KRadius, KRadius)) + 1) & ~ 1;
-                const size_t right_bound_x = std::min<unsigned>(x + KRadius, expanded_image.getWidth() - 1) / 2 * 2;
-                const size_t bottom_bound_y = std::min<unsigned>(y + KRadius, expanded_image.getHeight() - 1) / 2 * 2;
-                Pixel new_pixel{0,0,0,UCHAR_MAX};
-
-                int num_of_neighbors = ((right_bound_x - left_bound_x) / 2 + 1) * ((bottom_bound_y - top_bound_y) / 2 + 1);
-
-                for(int i = top_bound_y; i <= bottom_bound_y; i += 2)
-                {
-                    for(int j = left_bound_x; j <= right_bound_x; j += 2)
-                    {
-                        new_pixel = pixelSum(new_pixel, pixelDivision( image.getPixel(j / 2, i / 2), num_of_neighbors));
-                    }
-                }
-
-                expanded_image.setPixel(x, y, new_pixel);
-            }
-        }
-        return expanded_image;
-    }
 
 
 

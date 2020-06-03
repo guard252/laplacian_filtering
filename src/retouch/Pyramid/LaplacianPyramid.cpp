@@ -10,8 +10,8 @@ namespace retouch
 
     LaplacianPyramid::LaplacianPyramid(const Image& image, size_t layers_count)
     {
-        GaussianPyramid gaussian_pyramid(image);
-        for(int layer = 0; layer != gaussian_pyramid.getLayers().size() - 1 && layer != layers_count - 1; layer++)
+        GaussianPyramid gaussian_pyramid(image, layers_count);
+        for(int layer = 0; layer != layers_count - 1; layer++)
         {
             Image reduced_and_expanded = gaussian_pyramid.expand(layer + 1);;
             m_layers.push_back(gaussian_pyramid[layer] - reduced_and_expanded);
