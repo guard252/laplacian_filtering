@@ -106,5 +106,12 @@ namespace retouch
         m_layers[layer].setPixel(x, y, pixel);
     }
 
+    Image LaplacianPyramid::getLaplacianLayer(const Image &image, size_t layer)
+    {
+        GaussianPyramid gaussian_pyr(GaussianPyramid::getGaussianLayer(image, layer), 2);
+        return gaussian_pyr[0] - gaussian_pyr.expand(1);
+    }
+
+
 
 }

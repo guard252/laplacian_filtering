@@ -53,6 +53,16 @@ namespace retouch
         }
     }
 
+    size_t GaussianPyramid::getLayerSize(size_t width_or_height, size_t layer)
+    {
+        while(layer--)
+        {
+            width_or_height = (width_or_height + 1) / 2;
+        }
+        return width_or_height;
+    }
+
+
     Image GaussianPyramid::reduce(size_t layer_index)
     {
         Image reduced_image((m_layers[layer_index].getWidth() + 1) / 2,
@@ -121,8 +131,42 @@ namespace retouch
         return expanded_image;
     }
 
+    Image GaussianPyramid::getGaussianLayer(const Image &image, size_t layer)
+    {
+        if(layer == 0) return image;
+        size_t width = getLayerSize(image.getWidth(), layer);
+        size_t height = getLayerSize(image.getHeight(), layer);
+
+        Image reduced_image(width, height);
+
+        const int KRadius = 1;
+        for(int y = 0; y < reduced_image.getHeight(); y++)
+        {
+            for(int x = 0; x < reduced_image.getWidth(); x++)
+            {
+                const size_t left_bound_x = std::max<int>(pow(2, layer) * x - KRadius, 0);
+                const size_t top_bound_y = std::max<int>(pow(2, layer) * y - KRadius, 0);
+                const size_t right_bound_x = std::min<size_t>(pow(2, layer) * x + KRadius, image.getWidth() - 1);
+                const size_t bottom_bound_y = std::min<size_t>(pow(2, layer) * y + KRadius, image.getHeight() - 1);
+
+                Pixel new_pixel{0,0,0,UCHAR_MAX};
+
+                int num_of_neighbors = ((right_bound_x - left_bound_x)) * ((bottom_bound_y - top_bound_y));
 
 
+                for(int j = top_bound_y; j != bottom_bound_y; j++)
+                {
+                    for(int i = left_bound_x; i != right_bound_x; i++)
+                    {
+                        new_pixel = pixelSum(new_pixel, pixelDivision(image.getPixel(i, j), num_of_neighbors));
+                    }
+                }
+
+                reduced_image.setPixel(x, y, new_pixel);
+            }
+        }
+        return reduced_image;
+    }
 
 
 }

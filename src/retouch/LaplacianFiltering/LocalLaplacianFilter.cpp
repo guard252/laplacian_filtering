@@ -74,12 +74,11 @@ namespace retouch
                     Image remapped_subimage = remap_function.remap(gaussian_pyramid[0], subimage_start,
                                                                    subimage_end, gaussian_pyramid[layer_number].getPixel(x, y));
 
-                    LaplacianPyramid temp_laplacian(remapped_subimage, layer_number + 2);
+                    Image new_particle = LaplacianPyramid::getLaplacianLayer(remapped_subimage, layer_number);
 
-
-                    int new_x = (x_in_full_resolution - subimage_start.x) / pow(2, layer_number) + 0.5;
-                    int new_y = (y_in_full_resolution - subimage_start.y) / pow(2, layer_number) + 0.5;
-                    Pixel new_pixel = temp_laplacian[layer_number].getPixel(new_x, new_y);
+                    int new_x = (x_in_full_resolution - subimage_start.x) / pow(2, layer_number);
+                    int new_y = (y_in_full_resolution - subimage_start.y) / pow(2, layer_number);
+                    Pixel new_pixel = new_particle.getPixel(new_x, new_y);
                     output_pyramid.setLayerPixel(layer_number, x, y, new_pixel);
 
                 }

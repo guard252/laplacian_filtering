@@ -13,6 +13,8 @@ namespace retouch
 
         void build(int num_of_layers);
 
+        static size_t getLayerSize(size_t width_or_height, size_t layer);
+
     public:
         static constexpr size_t KMin_image_resolution{ 2 };
 
@@ -28,10 +30,11 @@ namespace retouch
 
         const Image& operator[](size_t index) const { return m_layers.at(index); }
 
-    public:
         Image reduce(size_t layer_index);
 
         Image expand(size_t layer_index);
+
+        static Image getGaussianLayer(const Image& image, size_t layer);
 
     };
 }

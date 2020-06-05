@@ -13,8 +13,8 @@ public:
     }
     ~Timer()
     {
-        auto duration = std::chrono::duration_cast<std::chrono::seconds>(
-                std::chrono::system_clock::now() - start).count();
+        double duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now() - start).count() / 1000.;
         std::cout << "The operation took " << duration << " seconds\n";
     }
 };

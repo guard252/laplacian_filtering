@@ -11,6 +11,7 @@ namespace retouch
         std::vector<Image> m_layers;
     private:
         void build(const Image& image);
+
     public:
 
         LaplacianPyramid(const Image& first_layer);
@@ -33,6 +34,8 @@ namespace retouch
         Image expand(const Image& image, size_t layer_to_correspond) const;
 
         Image reconstructImage() const;
+
+        static Image getLaplacianLayer(const Image& image, size_t layer);
     };
 }
 
